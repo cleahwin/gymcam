@@ -67,36 +67,33 @@ class PackPathway(torch.nn.Module):
         frame_list = [slow_pathway, fast_pathway]
         return frame_list
 
-    def find_carthweels(self, url_link, video_path):
-        transform =  ApplyTransformToKey(
-            key="video",
-            transform=Compose(
-                [
-                    UniformTemporalSubsample(num_frames),
-                    Lambda(lambda x: x/255.0),
-                    NormalizeVideo(mean, std),
-                    ShortSideScale(
-                        size=side_size
-                    ),
-                    CenterCropVideo(crop_size),
-                    PackPathway()
-                ]
-            ),
-        )
+def find_cartwheels(video_path):
+    transform =  ApplyTransformToKey (
+        key="video",
+        transform=Compose(
+            [
+                UniformTemporalSubsample(num_frames),
+                Lambda(lambda x: x/255.0),
+                NormalizeVideo(mean, std),
+                ShortSideScale(
+                    size=side_size
+                ),
+                CenterCropVideo(crop_size),
+                PackPathway()
+            ]
+        ),
+    )
 
-        # The duration of the input clip is also specific to the model.
-        clip_duration = (num_frames * sampling_rate)/frames_per_second
+    # The duration of the input clip is also specific to the model.
+    clip_duration = (num_frames * sampling_rate)/frames_per_second
 
-        # try: urllib.URLopener().retrieve(url_link, video_path)
-        # except: urllib.request.urlretrieve(url_link, video_path)
-
+    # Initialize an EncodedVideo helper class and load the video
+    video = EncodedVideo.from_path(video_path)
+    chunk_secs = 3
+    for start_sec in range(0, chunk_secs, video.duration):
+        end_sec = start_sec + chunk_secs
         # Select the duration of the clip to load by specifying the start and end duration
         # The start_sec should correspond to where the action occurs in the video
-        start_sec = 10
-        end_sec = 14
-
-        # Initialize an EncodedVideo helper class and load the video
-        video = EncodedVideo.from_path(video_path)
 
         # Load the desired clip
         video_data = video.get_clip(start_sec=start_sec, end_sec=end_sec)
@@ -119,7 +116,9 @@ class PackPathway(torch.nn.Module):
         # Map the predicted classes to the label names
         pred_class_names = [kinetics_id_to_classname[int(i)] for i in pred_classes]
         print("Top 5 predicted labels: %s" % ", ".join(pred_class_names))
-
-    url_link = "C://Users//Cleah//Documents//Prjects//GymCam2022//gymcam"
-    video_path = 'cartwheel.mp4'
-    find_carthweels(url_link, video_path)
+        if "cartwheel" in pred_class_names:
+            print(start_sec)
+            print(end_sec)
+    
+video_path = 'cartwheel.mp4'
+find_cartwheels(url_link, video_path)
