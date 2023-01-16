@@ -89,8 +89,13 @@ def find_cartwheels(video_path):
 
     # Initialize an EncodedVideo helper class and load the video
     video = EncodedVideo.from_path(video_path)
-    chunk_secs = 3
-    for start_sec in range(0, chunk_secs, video.duration):
+    # Time length for 'chunk' that we look at a time
+    chunk_secs = 64 / frames_per_second  # approx. 5 seconds
+    # List of start seconds for each 2 second chunk where there is a carthweel
+    cartwheel_intervals = []
+    print(int(video.duration))
+    for start_sec in range(0, int(video.duration), int(chunk_secs)):
+        print(f"start_sec: {start_sec}")
         end_sec = start_sec + chunk_secs
         # Select the duration of the clip to load by specifying the start and end duration
         # The start_sec should correspond to where the action occurs in the video
@@ -116,9 +121,13 @@ def find_cartwheels(video_path):
         # Map the predicted classes to the label names
         pred_class_names = [kinetics_id_to_classname[int(i)] for i in pred_classes]
         print("Top 5 predicted labels: %s" % ", ".join(pred_class_names))
-        if "cartwheel" in pred_class_names:
-            print(start_sec)
-            print(end_sec)
+        # Updates list with start time segment if chunk contained carthweel
+        if "cartwheeling" in pred_class_names:
+            cartwheel_intervals.append(start_sec)
+
+    print(cartwheel_intervals)
+            
+
     
 video_path = 'cartwheel.mp4'
-find_cartwheels(url_link, video_path)
+find_cartwheels(video_path)
