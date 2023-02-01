@@ -3,7 +3,7 @@ from typing import Dict
 import json
 import urllib
 import cv2
-import tqdm        
+from tqdm import tqdm        
 from torchvision.transforms import Compose, Lambda
 from torchvision.transforms._transforms_video import (
     CenterCropVideo,
@@ -69,44 +69,47 @@ class PackPathway(torch.nn.Module):
         frame_list = [slow_pathway, fast_pathway]
         return frame_list
 
-def save_chunks():
-        # Open video
-        video_path = "some_path.mp4"
-        cap = cv2.VideoCapture(video_path)
-        num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+def save_chunks(cartwheel_intervals):
+    print("In save_chunks!")
+    # Open video
+    video_path = "cartwheel_short.mp4"
+    cap = cv2.VideoCapture(video_path)
+    save_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        # Read first frame
-        ret, frame = cap.read()
-        h, w, _ = frame.shape
+    # Read first frame
+    ret, frame = cap.read()
+    h, w, _ = frame.shape
 
-        # Initialize writers to output files (1 file for each chunk)
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        writers = []
-        num_outputs = 0
-        for (chunk_range, chunk_name) in [((2,5), "cartwheel_1"), ((9,15), "cartwheel_2")]:
-            chunk_name = f"{chunk_name}.mp4"
-            writers.append(cv2.VideoWriter(chunk_name, fourcc, 20.0, (w, h)))
+    # Initialize writers to output files (1 file for each chunk)
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    writers = []
+    num_outputs = 0
+    iteration = 0
+    for chunk_range in cartwheel_intervals:
+        iteration = iteration + 1;
+        chunk_name = f"cartwheel{iteration}.mp4"
+        writers.append(cv2.VideoWriter(chunk_name, fourcc, 20.0, (w, h)))
 
-            num_outputs += 1
-            if limit is not None and num_outputs == limit:
-                break
+        num_outputs += 1
+        # if limit is not None and num_outputs == limit:
+        #     break
 
-        # Read and write to output files
-        f = 0
-        with tqdm(total=(num_frames - 1)) as progress_bar:
-            while ret:
-                f += 1
-                for i, part in enumerate(parts):
-                    start, end = part
-                    if start <= f <= end:
-                        writers[i].write(frame)
-                ret, frame = cap.read()
-                progress_bar.update(1)
+    # Read and write to output files
+    f = 0
+    with tqdm(total=(save_num_frames - 1)) as progress_bar:
+        while ret:
+            f += 1
+            for i, part in enumerate(cartwheel_intervals):
+                start, end = part
+                if start <= f <= end:
+                    writers[i].write(frame)
+            ret, frame = cap.read()
+            progress_bar.update(1)
 
-        for writer in writers:
-            writer.release()
+    for writer in writers:
+        writer.release()
 
-        cap.release()
+    cap.release()
 
 def find_cartwheels(video_path):
     transform =  ApplyTransformToKey (
@@ -150,7 +153,7 @@ def find_cartwheels(video_path):
 
     #TODO: Start sec starts at 2 to ignore camera setup time; change this back to 0
     #   when app has countdown for when session starts
-    for start_sec in range(3, int(video.duration), int(chunk_secs) - 1):
+    for start_sec in range(1, int(video.duration), int(chunk_secs) - 1):
         print(f"start_sec: {start_sec}")
         end_sec = start_sec + chunk_secs
         # Select the duration of the clip to load by specifying the start and end duration
@@ -194,6 +197,10 @@ def find_cartwheels(video_path):
     
     print(cartwheel_combined_intervals)
 
+    return cartwheel_combined_intervals
+
     
-video_path = 'cartwheel2.mp4'
-find_cartwheels(video_path)
+video_path = 'cartwheel_short.mp4'
+cartwheel_combined_intervals = find_cartwheels(video_path)
+# find_cartwheels(video_path)
+save_chunks(cartwheel_combined_intervals)
