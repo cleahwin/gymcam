@@ -72,7 +72,7 @@ class PackPathway(torch.nn.Module):
 def save_chunks(cartwheel_intervals):
     print("In save_chunks!")
     # Open video
-    video_path = "cartwheel_short.mp4"
+    video_path = "cartwheel.mp4"
     cap = cv2.VideoCapture(video_path)
     save_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -102,8 +102,11 @@ def save_chunks(cartwheel_intervals):
             for i, part in enumerate(cartwheel_intervals):
                 start, end = part
                 if start <= f <= end:
-                    writers[i].write(frame)
-            ret, frame = cap.read()
+                    # print("i has a value that is the exact same value as")
+                    # # print(i)
+                    for j in range(frames_per_second):
+                        writers[i].write(frame)
+                        ret, frame = cap.read()
             progress_bar.update(1)
 
     for writer in writers:
@@ -195,12 +198,12 @@ def find_cartwheels(video_path):
 
     print(cartwheel_intervals)
     
-    print(cartwheel_combined_intervals)
+    print(f" cartwheel_combined - {cartwheel_combined_intervals}")
 
     return cartwheel_combined_intervals
 
     
-video_path = 'cartwheel_short.mp4'
+video_path = 'cartwheel.mp4'
 cartwheel_combined_intervals = find_cartwheels(video_path)
 # find_cartwheels(video_path)
 save_chunks(cartwheel_combined_intervals)
