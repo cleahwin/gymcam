@@ -72,7 +72,7 @@ class PackPathway(torch.nn.Module):
 def save_chunks(cartwheel_intervals):
     print("In save_chunks!")
     # Open video
-    video_path = "cartwheel.mp4"
+    video_path = "cartwheel_short.mp4"
     cap = cv2.VideoCapture(video_path)
     save_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -96,21 +96,39 @@ def save_chunks(cartwheel_intervals):
 
     # Read and write to output files
     f = 0
-    with tqdm(total=(save_num_frames - 1)) as progress_bar:
-        while ret:
-            f += 1
-            for i, part in enumerate(cartwheel_intervals):
-                start, end = part
-                if start <= f <= end:
-                    # print("i has a value that is the exact same value as")
-                    # # print(i)
-                    for j in range(frames_per_second):
-                        writers[i].write(frame)
-                        ret, frame = cap.read()
-            progress_bar.update(1)
 
-    for writer in writers:
-        writer.release()
+        # f += 1
+    for i, part in enumerate(cartwheel_intervals):
+        print('hiiiiii')
+        print(i)
+        print(part)
+        start, end = part
+        while f < start:
+            for j in range(frames_per_second):
+                cap.read()
+            f = f + 1
+        while f <= end:
+            for j in range(frames_per_second):
+                ret, frame = cap.read()
+                writers[i].write(frame)
+            f = f + 1
+   
+
+    # with tqdm(total=(save_num_frames - 1)) as progress_bar:
+    #     while ret:
+    #         f += 1
+    #         for i, part in enumerate(cartwheel_intervals):
+    #             start, end = part
+    #             if start <= f <= end:
+    #                 # print("i has a value that is the exact same value as")
+    #                 # # print(i)
+    #                 for j in range(frames_per_second):
+    #                     writers[i].write(frame)
+    #                     ret, frame = cap.read()
+    #         progress_bar.update(1)
+
+    # for writer in writers:
+    #     writer.release()
 
     cap.release()
 
@@ -193,7 +211,8 @@ def find_cartwheels(video_path):
             if has_previous_cartwheel:
                 cartwheel_combined_intervals.append((current_cartwheel, start_sec))
                 has_previous_cartwheel = False
-
+    if has_previous_cartwheel:
+        cartwheel_combined_intervals.append((current_cartwheel, int(video.duration)))
         # check if time intervals containing cartwheels are consecutive
 
     print(cartwheel_intervals)
@@ -203,7 +222,7 @@ def find_cartwheels(video_path):
     return cartwheel_combined_intervals
 
     
-video_path = 'cartwheel.mp4'
+video_path = 'cartwheel_short.mp4'
 cartwheel_combined_intervals = find_cartwheels(video_path)
 # find_cartwheels(video_path)
 save_chunks(cartwheel_combined_intervals)
