@@ -64,7 +64,7 @@ print (response.json())
 # Perform search with simple query (Visual)
 SEARCH_URL = f"{API_URL}/search"
 data = {
-    "query": "cartwheel",
+    "query": "handstand",
     "index_id": INDEX_ID,
     "search_options": ["visual"],
 }
