@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
+import json
 from io import StringIO
 
 # Name of index for storing video data
@@ -40,8 +41,8 @@ if uploaded_file is not None:
 # # #### TwelveLabs Integration
 
 
-file_name = "two_handstand_10sec.mp4"
-file_path = "C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//two_handstand_10sec.mp4"
+file_name = "two_cartwheel_1.mp4"
+file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
 file_stream = open(file_path,"rb")
 
 # Upload video to TwelveLab's index specified above
@@ -63,12 +64,27 @@ print (response.json())
 
 # Perform search with simple query (Visual)
 SEARCH_URL = f"{API_URL}/search"
-data = {
+data_cartwheel = {
     "query": "cartwheel",
     "index_id": INDEX_ID,
     "search_options": ["visual"],
 }
-response = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data)
-print (f"Status code: {response.status_code}")
-print (response.json())
+data_handstand = {
+    "query": "handstand",
+    "index_id": INDEX_ID,
+    "search_options": ["visual"],
+}
+response_cartwheel = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_cartwheel)
+response_handstand = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_handstand)
+print (f"Status code cartwheel: {response_cartwheel.status_code}")
+print (f"Status code handstand: {response_handstand.status_code}")
+print (f"Cartwheel Response: {response_cartwheel.json()}")
+print (f"Handstand Response: {response_handstand.json()}")
 
+cartwheel_score = (response_cartwheel.json())['data'][0]['score']
+# handstand_score = (response_handstand.json())['data'][0]['score']
+# print(f"Handstand score {handstand_score}")
+# if (cartwheel_score > handstand_score):
+#     print(f"Predicting cartwheel with score {cartwheel_score}")
+# else:
+#     print(f"Predicting handstand with score {handstand_score}")
