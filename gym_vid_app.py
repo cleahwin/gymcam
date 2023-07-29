@@ -38,53 +38,54 @@ if uploaded_file is not None:
 
     st.video(video_bytes)
 
-# # #### TwelveLabs Integration
+    # # #### TwelveLabs Integration
 
 
-file_name = "two_cartwheel_1.mp4"
-file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
-file_stream = open(file_path,"rb")
+    file_name = "two_cartwheel_1.mp4"
+    file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
+    file_stream = open(file_path,"rb")
 
-# Upload video to TwelveLab's index specified above
-data = {
-    "index_id": INDEX_ID, 
-    "language": "en"
-}
-file_param = [
-    ("video_file", (file_name, file_stream, "application/octet-stream")),]
+    # Upload video to TwelveLab's index specified above
+    data = {
+        "index_id": INDEX_ID, 
+        "language": "en"
+    }
+    file_param = [
+        ("video_file", (file_name, file_stream, "application/octet-stream")),]
 
-response = requests.post(TASKS_URL, headers={"x-api-key": API_KEY}, data=data, files=file_param)
-response = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
+    response = requests.post(TASKS_URL, headers={"x-api-key": API_KEY}, data=data, files=file_param)
+    response = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
 
-print(response.text)
+    print(response.text)
 
-TASK_ID = response.json().get("_id")
-print (f"Status code: {response.status_code}")
-print (response.json())
+    TASK_ID = response.json().get("_id")
+    print (f"Status code: {response.status_code}")
+    print (response.json())
 
-# Perform search with simple query (Visual)
-SEARCH_URL = f"{API_URL}/search"
-data_cartwheel = {
-    "query": "cartwheel",
-    "index_id": INDEX_ID,
-    "search_options": ["visual"],
-}
-data_handstand = {
-    "query": "handstand",
-    "index_id": INDEX_ID,
-    "search_options": ["visual"],
-}
-response_cartwheel = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_cartwheel)
-response_handstand = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_handstand)
-print (f"Status code cartwheel: {response_cartwheel.status_code}")
-print (f"Status code handstand: {response_handstand.status_code}")
-print (f"Cartwheel Response: {response_cartwheel.json()}")
-print (f"Handstand Response: {response_handstand.json()}")
+    # Perform search with simple query (Visual)
+    SEARCH_URL = f"{API_URL}/search"
+    data_cartwheel = {
+        "query": "cartwheel",
+        "index_id": INDEX_ID,
+        "search_options": ["visual"],
+    }
+    data_handstand = {
+        "query": "handstand",
+        "index_id": INDEX_ID,
+        "search_options": ["visual"],
+    }
+    response_cartwheel = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_cartwheel)
+    response_handstand = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_handstand)
+    print(f"PLAIN: {response_handstand}")
+    print (f"Status code cartwheel: {response_cartwheel.status_code}")
+    print (f"Status code handstand: {response_handstand.status_code}")
+    print (f"Cartwheel Response: {response_cartwheel.json()}")
+    print (f"Handstand Response: {response_handstand.json()}")
 
-cartwheel_score = (response_cartwheel.json())['data'][0]['score']
-# handstand_score = (response_handstand.json())['data'][0]['score']
-# print(f"Handstand score {handstand_score}")
-# if (cartwheel_score > handstand_score):
-#     print(f"Predicting cartwheel with score {cartwheel_score}")
-# else:
-#     print(f"Predicting handstand with score {handstand_score}")
+    cartwheel_score = (response_cartwheel.json())['data'][0]['score']
+    handstand_score = (response_handstand.json())['data'][0]['score']
+    print(f"Handstand score {handstand_score}")
+    if (cartwheel_score > handstand_score):
+        print(f"Predicting cartwheel with score {cartwheel_score}")
+    else:
+        print(f"Predicting handstand with score {handstand_score}")
