@@ -33,7 +33,8 @@ if uploaded_file is not None:
     # st.write(dataframe)
 
 #     # print(f"Uploaded File {uploaded_file.name}")
-    video_file = open(uploaded_file.name, 'rb')
+    # video_file = open(uploaded_file.name, 'rb')
+    video_file = uploaded_file
     video_bytes = video_file.read()
 
     st.video(video_bytes)
@@ -41,9 +42,10 @@ if uploaded_file is not None:
     # # #### TwelveLabs Integration
 
 
-    file_name = "two_cartwheel_1.mp4"
-    file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
-    file_stream = open(file_path,"rb")
+    file_name = uploaded_file.name
+    file_path = file_name
+    # file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
+    file_stream = open(file_name,"rb")
 
     # Upload video to TwelveLab's index specified above
     data = {
