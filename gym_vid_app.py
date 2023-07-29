@@ -4,6 +4,7 @@ import numpy as np
 import requests
 import json
 from io import StringIO
+import time
 
 # Name of index for storing video data
 INDEX_ID = "64be0834e180755b8bc4df6a"
@@ -77,6 +78,7 @@ if uploaded_file is not None:
         "search_options": ["visual"],
     }
     response_cartwheel = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_cartwheel)
+    time.sleep(0.5)
     response_handstand = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_handstand)
     print(f"PLAIN: {response_handstand}")
     print (f"Status code cartwheel: {response_cartwheel.status_code}")
