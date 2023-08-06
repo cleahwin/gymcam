@@ -6,6 +6,7 @@ from io import StringIO
 import time
 import ffmpeg
 from datetime import datetime
+import streamlit as st
 
 INDEX_ID = "64be0834e180755b8bc4df6a"
 API_URL = "https://api.twelvelabs.io/v1.1"
@@ -38,39 +39,34 @@ def upload_video(file_name, file_stream):
         response = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
         video_ids.append(response.json().get('video_id'))
 
+
+@st.cache
+def query_single(search_query):
+    SEARCH_URL = f"{API_URL}/search"
+    data = {
+        "query": search_query,
+        "index_id": INDEX_ID,
+        "search_options": ["visual"],
+    }
+    response = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data)
+    print(f"Status code: {response.status_code}")
+    print(f"Response: {response.json()}")
+    score = (response.json())['data'][0]['score']
+
+    return score
+
+
 def visual_query():
     """
     Performs a visual query on the video using certain searches using TwelveLabs API
 
     Param - none
-    Return - map of 
-    
+    Return - map of
     """
     # Perform search with simple query (Visual)
-    SEARCH_URL = f"{API_URL}/search"
-    data_one = {
-        "query": "kick legs over",
-        "index_id": INDEX_ID,
-        "search_options": ["visual"],
-    }
-    data_two = {
-        "query": "handstand",
-        "index_id": INDEX_ID,
-        "search_options": ["visual"],
-    }
-    response_one = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_one)
-    one_score = (response_one.json())['data'][0]['score']
-    print (f"Status code one: {response_one.status_code}")
-    print (f"One Response: {response_one.json()}")
-
+    one_score = query_single("kick legs over")
     time.sleep(0.1)
-    response_two = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data_two)
-    print(f"PLAIN!: {response_two}")
-    print (f"Status code handstand: {response_two.status_code}")
-    print (f"Handstand Response: {response_two.json()}")
-
-    two_score = (response_two.json())['data'][0]['score']
-
+    two_score = query_single("handstand")
     return (one_score, two_score)
 
 def process_scores():
