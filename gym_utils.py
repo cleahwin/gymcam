@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 import requests
 import json
 from io import StringIO
@@ -24,8 +25,12 @@ def upload_video(file_name, file_stream):
     """
 
     url = "https://api.twelvelabs.io/v1.1/indexes/index-id/videos?filename=goodday"
+    print(requests.get(url, headers={"x-api-key": API_KEY}).json())
     # TODO: Determine how to see if file name is there
-    if (file_name not in requests.get(url, headers={"x-api-key": API_KEY})):
+    if (file_name in requests.get(url, headers={"x-api-key": API_KEY})):
+        # Handles case that video has already been added
+        st.warning("This video has already been added. Please upload a new video.")
+    else:
         data = {
             "index_id": INDEX_ID, 
             "language": "en"
@@ -39,42 +44,35 @@ def upload_video(file_name, file_stream):
         response = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
         video_ids.append(response.json().get('video_id'))
 
-
 @st.cache
-def query_single(search_query):
-    SEARCH_URL = f"{API_URL}/search"
-    data = {
-        "query": search_query,
-        "index_id": INDEX_ID,
-        "search_options": ["visual"],
-    }
-    response = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data)
-    print(f"Status code: {response.status_code}")
-    print(f"Response: {response.json()}")
-    score = (response.json())['data'][0]['score']
-
-    return score
-
-
-def visual_query():
+def visual_query(pose):
     """
     Performs a visual query on the video using certain searches using TwelveLabs API
 
-    Param - none
-    Return - map of
+    Param - pose to query on
+    Return - map of 
+    
     """
     # Perform search with simple query (Visual)
-    one_score = query_single("kick legs over")
-    time.sleep(0.1)
-    two_score = query_single("handstand")
-    return (one_score, two_score)
+    SEARCH_URL = f"{API_URL}/search"
+    data = {
+        "query": pose,
+        "index_id": INDEX_ID,
+        "search_options": ["visual"],
+    }
+    response_one = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data)
+    one_score = (response_one.json())['data'][0]['score']
+    print (f"Status code one: {response_one.status_code}")
+    print (f"One Response: {response_one.json()}")
+
+    return one_score
 
 def process_scores():
     """
     Processes scores of various searches to determine the class of the move in a time segment
 
     Param - none
-    Return - returns a tuple containing the move, start, and end time of it
+    Return - returns a list of tuples consisting of a file name, start and end time, and label name
 
     """
     # cartwheel_results = visual_query("cartwheel")
@@ -89,24 +87,25 @@ def process_scores():
     #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand")
     # return results
 
-def video_segment(filename, start, end, pose):
+def video_segment(processed_data):
     """
     Extracts video segment containing specific move and outputs to appropriate file location
 
-    Param - file name of video and start time and end time of segment
+    Param - list of tuples in the format (file name, start time, end time, pose)
     Return - returns the file path that the segment was saved to
 
     """
-    now = datetime.now()
-    currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
-    
-    input_file = ffmpeg.input(filename)
-    output_file = ffmpeg.output(
-                    input_file.video.trim(start=start, end=end), 
-                    input_file.audio, 
-                    f"{pose}-{currTime}"
-                )
-    output_file.run()
+    for chunk in processed_data:
+        now = datetime.now()
+        currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
+        
+        input_file = ffmpeg.input(chunk[0])
+        output_file = ffmpeg.output(
+                        input_file.video.trim(start=chunk[1], end=chunk[2]), 
+                        input_file.audio, 
+                        f"{chunk[3]}-{currTime}"
+                    )
+        output_file.run()
 
 
 
