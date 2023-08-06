@@ -45,31 +45,31 @@ if uploaded_file is not None:
     # # #### TwelveLabs Integration
     print("Got video!")
 
-    # file_name = uploaded_file.name
-    # # print(f"HERE!!!!!!!!!!!!!!!!!!! {file_name}")
-    # file_path = file_name
-    # # file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
-    # file_stream = open(file_name,"rb")
+    file_name = uploaded_file.name
+    # print(f"HERE!!!!!!!!!!!!!!!!!!! {file_name}")
+    file_path = file_name
+    # file_path = f"C://Users//Cleah//Documents//Projects//GymCam2022//gymcam//{file_name}"
+    file_stream = open(file_name,"rb")
 
-    # # Upload video to TwelveLab's index specified above
-    # data = {
-    #     "index_id": INDEX_ID, 
-    #     "language": "en"
-    # }
-    # file_param = [
-    #     ("video_file", (file_name, file_stream, "application/octet-stream")),]
-    # print("Uploaded to index")
-    # response = requests.post(TASKS_URL, headers={"x-api-key": API_KEY}, data=data, files=file_param)
-    # print("Adding to index")
-    # response_get = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
-    # print(f"ResponseGet : {response_get.json().get('video_id')}")
-    # print("Getting index")
+    # Upload video to TwelveLab's index specified above
+    data = {
+        "index_id": INDEX_ID, 
+        "language": "en"
+    }
+    file_param = [
+        ("video_file", (file_name, file_stream, "application/octet-stream")),]
+    print("Uploaded to index")
+    response = requests.post(TASKS_URL, headers={"x-api-key": API_KEY}, data=data, files=file_param)
+    print("Adding to index")
+    response_get = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
+    print(f"ResponseGet : {response_get.json().get('video_id')}")
+    print("Getting index")
     
-    # print(response.text)
+    print(response.text)
 
-    # TASK_ID = response.json().get("_id")
-    # print (f"Status code: {response.status_code}")
-    # print (response.json())
+    TASK_ID = response.json().get("_id")
+    print (f"Status code: {response.status_code}")
+    print (response.json())
 
     # Perform search with simple query (Visual)
     SEARCH_URL = f"{API_URL}/search"
