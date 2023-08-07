@@ -24,7 +24,7 @@ def upload_video(file_name, file_stream):
 
     """
 
-    url = "https://api.twelvelabs.io/v1.1/indexes/index-id/videos?filename=goodday"
+    url = "https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos"
     print(requests.get(url, headers={"x-api-key": API_KEY}).json())
     # TODO: Determine how to see if file name is there
     if (file_name in requests.get(url, headers={"x-api-key": API_KEY})):
