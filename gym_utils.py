@@ -23,26 +23,45 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
 
     """
+    task_list_response = requests.get(
+        TASKS_URL,
+        headers={"x-api-key": API_KEY},
+        params={"index_id": INDEX_ID, "filename": file_name},
+    )
+    if "data" in task_list_response.json():
+        task_list = task_list_response.json()["data"]
+        if len(task_list) > 0:
+            # if task_list[0]['status'] == 'ready': 
+            #     print(f"Video '{file_name}' already exists in index {INDEX_ID}")
+            # else:
+            #     print("task pending or validating")
+            st.warning("This video has already been added. Please upload a new video.")
+            return
 
-    url = "https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos"
-    print(requests.get(url, headers={"x-api-key": API_KEY}).json())
-    # TODO: Determine how to see if file name is there
-    if (file_name in requests.get(url, headers={"x-api-key": API_KEY})):
-        # Handles case that video has already been added
-        st.warning("This video has already been added. Please upload a new video.")
-    else:
-        data = {
-            "index_id": INDEX_ID, 
-            "language": "en"
-        }
-        file_param = [
-            ("video_file", (file_name, file_stream, "application/octet-stream")),]
-        # uploads video to index
-        requests.post(TASKS_URL, headers={"x-api-key": API_KEY}, data=data, files=file_param)
+    # Proceed further to create a new task to index the current video if the video didn't exist in the index already
+    print("Entering task creation code for the file: ", file_name)
 
-        # updates list of video ids
-        response = requests.get(TASKS_URL, headers={"x-api-key": API_KEY})
-        video_ids.append(response.json().get('video_id'))
+    if file_name.endswith('.mp4'):  # Make sure the file is an MP4 video
+        file_path = os.path.join('', file_name)  # Get the full path of the video file
+        with open(file_path, "rb") as file_stream:
+            data = {
+                "index_id": INDEX_ID,
+                "language": "en"
+            }
+            file_param = [
+                ("video_file", (file_name, file_stream, "application/octet-stream")),] #The video will be indexed on the platform using the same name as the video file itself.
+            response = requests.post(TASKS_URL, headers=default_header, data=data, files=file_param)
+            TASK_ID = response.json().get("_id")
+            TASK_ID_LIST.append(TASK_ID)
+            # Check if the status code is 201 and print success
+            if response.status_code == 201:
+                print(f"Status code: {response.status_code} - The request was successful and a new resource was created.")
+            else:
+                print(f"Status code: {response.status_code}")
+            print(f"File name: {file_name}")
+            pprint(response.json())
+            print("\n")
+
 
 @st.cache
 def visual_query(pose):
