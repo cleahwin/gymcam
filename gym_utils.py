@@ -55,16 +55,23 @@ def visual_query(pose):
     """
     # Perform search with simple query (Visual)
     SEARCH_URL = f"{API_URL}/search"
-    data = {
-        "query": pose,
+    data =  {
         "index_id": INDEX_ID,
         "search_options": ["visual"],
+        "query": {
+            "$not": {
+                "origin": {
+                    "text": "cartwheel"
+                },
+                "sub": {
+                    "text": "handstand"
+                }
+            }
+        }
     }
-    response_one = requests.post(SEARCH_URL, headers={"x-api-key": API_KEY}, json=data)
-    one_score = (response_one.json())['data'][0]['score']
-    print (f"Status code one: {response_one.status_code}")
-    print (f"One Response: {response_one.json()}")
-
+    response = requests.post(SEARCH_URL, headers=headers, json=data)
+    print(f'Status code: {response.status_code}')
+    print(response.json())
     return one_score
 
 def process_scores():
