@@ -16,15 +16,15 @@ default_header = {
     "x-api-key": API_KEY
 }
 
-INDEXES_VIDEOS_URL = f"{API_URL}/indexes/{INDEX_ID}/videos?page_limit=20"
+INDEXES_VIDEOS_URL = f"{API_URL}/indexes/{INDEX_ID}/videos?page_limit=50"
 response = requests.get(INDEXES_VIDEOS_URL, headers=default_header)
 
 response_json = response.json()
 print(response_json)
-
+# quit()
 for video in response_json['data']:
     print(video['_id'])
-    url = "https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video['_id']}"
+    url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video['_id']}"
     headers = {
         "accept": "application/json",
         "Content-Type": "application/json",
