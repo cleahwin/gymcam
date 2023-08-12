@@ -2,12 +2,15 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import requests
+import os
 import json
 from io import StringIO
 import time
 import ffmpeg
 from datetime import datetime
 import streamlit as st
+
+
 
 INDEX_ID = "64be0834e180755b8bc4df6a"
 API_URL = "https://api.twelvelabs.io/v1.1"
@@ -21,7 +24,7 @@ def upload_video(file_name, file_stream):
     Uploads provided video file name to the GymCam index (based on index_id above)
 
     Param - takes in the file name and file stream
-
+    Return - boolean which has value true if the video was already in the index
     """
     task_list_response = requests.get(
         TASKS_URL,
@@ -31,12 +34,8 @@ def upload_video(file_name, file_stream):
     if "data" in task_list_response.json():
         task_list = task_list_response.json()["data"]
         if len(task_list) > 0:
-            # if task_list[0]['status'] == 'ready': 
-            #     print(f"Video '{file_name}' already exists in index {INDEX_ID}")
-            # else:
-            #     print("task pending or validating")
             st.warning("This video has already been added. Please upload a new video.")
-            return
+            return True
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
@@ -59,9 +58,10 @@ def upload_video(file_name, file_stream):
             else:
                 print(f"Status code: {response.status_code}")
             print(f"File name: {file_name}")
-            pprint(response.json())
+            print(response.json())
             print("\n")
 
+    return False
 
 @st.cache
 def visual_query(pose):
@@ -88,10 +88,13 @@ def visual_query(pose):
             }
         }
     }
+    headers = {
+    "x-api-key": API_KEY
+}
     response = requests.post(SEARCH_URL, headers=headers, json=data)
     print(f'Status code: {response.status_code}')
     print(response.json())
-    return one_score
+
 
 def process_scores():
     """
@@ -101,17 +104,18 @@ def process_scores():
     Return - returns a list of tuples consisting of a file name, start and end time, and label name
 
     """
-    # cartwheel_results = visual_query("cartwheel")
-    # handstand_results = visual_query("handstand")
-    # results = []
+    cartwheel_results = visual_query("cartwheel")
+    handstand_results = visual_query("handstand")
+    results = []
     # for c_res in cartwheel_results:
     #     for h_res in handstand_results:
+            
     #         if is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
     #             if c_res['score'] > h_res['score']:
     #                 results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel")
     #             else:
     #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand")
-    # return results
+    return results
 
 def video_segment(processed_data):
     """
