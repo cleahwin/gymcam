@@ -40,16 +40,8 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
     Return - boolean which has value true if the video was already in the index
     """
-    task_list_response = requests.get(
-        TASKS_URL,
-        headers={"x-api-key": API_KEY},
-        params={"index_id": INDEX_ID, "filename": file_name},
-    )
-    if "data" in task_list_response.json():
-        task_list = task_list_response.json()["data"]
-        if len(task_list) > 0:
-            st.warning("This video has already been added. Please upload a new video.")
-            return True
+    if (contains_video(file_name, file_stream)): 
+        return True
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
@@ -128,9 +120,11 @@ def process_scores():
     cartwheel_results = visual_query("cartwheel")
     handstand_results = visual_query("handstand")
     results = []
-
+    print("hi!")
     for c_res in cartwheel_results["data"]:
+        print("hello again!")
         for h_res in handstand_results["data"]:
+            print("and again!")
             if c_res["video_id"] == h_res["video_id"] and max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
                 if c_res['score'] > h_res['score']:
                     results.append((convert_video_id_to_file_name(c_res['video_id']), c_res["start"], c_res["end"], "cartwheel"))
