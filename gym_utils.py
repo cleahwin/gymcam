@@ -103,7 +103,7 @@ def visual_query(pose):
     #     }
     # }
     data = {
-        "query": "cartwheel",
+        "query": pose,
         "index_id": INDEX_ID,
         "search_options": ["visual"],
     }

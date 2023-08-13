@@ -50,7 +50,8 @@ if uploaded_file is not None:
             st.warning("This video has already been added. Would you like to reclassify this video?")
             yes = st.button("Yes")
             no = st.button("No")
-            if (yes and not no):    
+            if (yes and not no):
+                print("hello!")
                 processed_data = gym_utils.process_scores()
         else:
             # Uses visual_query function in gym_utils to retrieve scores and 
