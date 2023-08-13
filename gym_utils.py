@@ -89,8 +89,8 @@ def visual_query(pose):
         }
     }
     headers = {
-    "x-api-key": API_KEY
-}
+        "x-api-key": API_KEY
+    }
     response = requests.post(SEARCH_URL, headers=headers, json=data)
     print(f'Status code: {response.status_code}')
     print(response.json())
@@ -107,14 +107,13 @@ def process_scores():
     cartwheel_results = visual_query("cartwheel")
     handstand_results = visual_query("handstand")
     results = []
-    # for c_res in cartwheel_results:
-    #     for h_res in handstand_results:
-            
-    #         if is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
-    #             if c_res['score'] > h_res['score']:
-    #                 results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel")
-    #             else:
-    #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand")
+    for c_res in cartwheel_results["data"]:
+        for h_res in handstand_results["data"]:
+            if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
+                if c_res['score'] > h_res['score']:
+                    results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel")
+                else:
+                    results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand")
     return results
 
 def video_segment(processed_data):
