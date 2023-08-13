@@ -83,7 +83,7 @@ def visual_query(pose):
     Performs a visual query on the video using certain searches using TwelveLabs API
 
     Param - pose to query on
-    Return - map of 
+    Return - the output of the query
     
     """
     # Perform search with simple query (Visual)
@@ -109,6 +109,8 @@ def visual_query(pose):
     print(f'Status code: {response.status_code}')
     print(response.json())
 
+    return response.json()
+
 
 def process_scores():
     """
@@ -121,6 +123,14 @@ def process_scores():
     cartwheel_results = visual_query("cartwheel")
     handstand_results = visual_query("handstand")
     results = []
+
+    for c_res in cartwheel_results["data"]:
+        for h_res in handstand_results["data"]:
+            if c_res["video_id"] == h_res["video_id"] and max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
+                if c_res['score'] > h_res['score']:
+                    results.append((convert_video_id_to_file_name(c_res['video_id']), c_res["start"], c_res["end"], "cartwheel"))
+                else:
+                    results.append((convert_video_id_to_file_name(h_res['video_id']), h_res["start"], h_res["end"], "handstand"))
     # for c_res in cartwheel_results["data"]:
     #     for h_res in handstand_results["data"]:
     #         if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
@@ -150,5 +160,25 @@ def video_segment(processed_data):
                     )
         output_file.run()
 
+
+def convert_video_id_to_file_name(video_id):
+    """
+    Converts provided video id to its corresponding local file name
+
+    Param - the video id to convert
+    Return - the filename of the provided video id
+
+    """
+
+    url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video_id}"
+
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return response.json().get("metadata").get("filename")
 
 
