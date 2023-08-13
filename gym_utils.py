@@ -74,27 +74,32 @@ def visual_query(pose):
     """
     # Perform search with simple query (Visual)
     SEARCH_URL = f"{API_URL}/search"
-    data =  {
+    # data =  {
+    #     "index_id": INDEX_ID,
+    #     "search_options": ["visual"],
+    #     "query": {
+    #         "$not": {
+    #             "origin": {
+    #                 "text": "cartwheel"
+    #             },
+    #             "sub": {
+    #                 "text": "handstand"
+    #             }
+    #         }
+    #     }
+    # }
+    data = {
+        "query": "cartwheel",
         "index_id": INDEX_ID,
         "search_options": ["visual"],
-        "query": {
-            "$not": {
-                "origin": {
-                    "text": "cartwheel"
-                },
-                "sub": {
-                    "text": "handstand"
-                }
-            }
-        }
     }
     headers = {
         "x-api-key": API_KEY
     }
     response = requests.post(SEARCH_URL, headers=headers, json=data)
     print(f'Status code: {response.status_code}')
-    print(response.json())
-
+    print(f"Response from Visual Query ==> {response.json()}")
+    
     return response.json()
 
 
@@ -117,6 +122,7 @@ def process_scores():
                     results.append((convert_video_id_to_file_name(c_res['video_id']), c_res["start"], c_res["end"], "cartwheel"))
                 else:
                     results.append((convert_video_id_to_file_name(h_res['video_id']), h_res["start"], h_res["end"], "handstand"))
+    print(f"Results ==> {results}")
     return results
 
 def video_segment(processed_data):
