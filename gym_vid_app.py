@@ -45,16 +45,8 @@ if uploaded_file is not None:
         file_path = file_name
         file_stream = open(file_name,"rb")
         contains_vid = gym_utils.contains_video(file_name, file_stream)
-        contin = True
-        if (contains_vid):
-            st.warning("This video has already been added. Would you like to reclassify this video?")
-            yes = st.button("Yes")
-            no = st.button("No")
-            if (yes and not no):    
-                processed_data = gym_utils.process_scores()
-        else:
-            # Uses visual_query function in gym_utils to retrieve scores and 
-            #   collect extracted data as time segments of specific moves
-            processed_data = gym_utils.process_scores()
-            # Segments video input based on processed data
-            # gym_utils.video_segment(processed_data)
+        processed_data = gym_utils.process_scores()
+        # Uses visual_query function in gym_utils to retrieve scores and 
+        #   collect extracted data as time segments of specific moves
+        # Segments video input based on processed data
+        # gym_utils.video_segment(processed_data)
