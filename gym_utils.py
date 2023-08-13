@@ -19,6 +19,20 @@ API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
 
 video_ids = []
 
+def contains_video(file_name, file_stream):
+    task_list_response = requests.get(
+        TASKS_URL,
+        headers={"x-api-key": API_KEY},
+        params={"index_id": INDEX_ID, "filename": file_name},
+    )
+    if "data" in task_list_response.json():
+        task_list = task_list_response.json()["data"]
+        if len(task_list) > 0:
+            st.warning("This video has already been added. Please upload a new video.")
+            return True
+    return False
+
+
 def upload_video(file_name, file_stream):
     """
     Uploads provided video file name to the GymCam index (based on index_id above)
@@ -122,6 +136,13 @@ def process_scores():
                     results.append((convert_video_id_to_file_name(c_res['video_id']), c_res["start"], c_res["end"], "cartwheel"))
                 else:
                     results.append((convert_video_id_to_file_name(h_res['video_id']), h_res["start"], h_res["end"], "handstand"))
+    # for c_res in cartwheel_results["data"]:
+    #     for h_res in handstand_results["data"]:
+    #         if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
+    #             if c_res['score'] > h_res['score']:
+    #                 results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel"))
+    #             else:
+    #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand"))
     print(f"Results ==> {results}")
     return results
 
