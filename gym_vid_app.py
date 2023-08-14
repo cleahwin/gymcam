@@ -44,7 +44,6 @@ if uploaded_file is not None:
         file_name = uploaded_file.name
         file_path = file_name
         file_stream = open(file_name,"rb")
-        contains_vid = gym_utils.contains_video(file_name, file_stream)
         processed_data = gym_utils.process_scores()
         # Uses visual_query function in gym_utils to retrieve scores and 
         #   collect extracted data as time segments of specific moves
