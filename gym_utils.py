@@ -24,7 +24,14 @@ headers_dict = {
 
 video_ids = []
 
-def contains_video(file_name, file_stream):
+def contains_video(file_name):
+    """
+    Checks if index contains provided file
+
+    Param - takes in the file name
+    Return - boolean which has value true if the video was already in the index
+    """
+
     task_list_response = requests.get(
         TASKS_URL,
         headers={"x-api-key": API_KEY},
@@ -46,8 +53,14 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
     Return - boolean which has value true if the video was already in the index
     """
+<<<<<<< HEAD
+
+    if (contains_video(file_name)): 
+        return True
+=======
     # if (contains_video(file_name, file_stream)): 
     #     return True
+>>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
@@ -80,11 +93,14 @@ def upload_video(file_name, file_stream):
 
     return False
 
+<<<<<<< HEAD
+=======
 # query_cache = {
 #   "cartwheel": {<INSERT THE RESPONSE HERE that visual_query gives you when the API stops timing out>},
 #   "hand stand": {<same thing here>},
 # }
 
+>>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 def visual_query(pose):
     """
     Performs a visual query on the video using certain searches using TwelveLabs API
@@ -147,11 +163,11 @@ def process_scores():
         print("hello again!")
         for h_res in handstand_results["data"]:
             print("and again!")
-            if c_res["video_id"] == h_res["video_id"] and max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
+            if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
                 if c_res['score'] > h_res['score']:
-                    results.append((convert_video_id_to_file_name(c_res['video_id']), c_res["start"], c_res["end"], "cartwheel"))
+                    results.append((c_res['video_id'], c_res["start"], c_res["end"], "cartwheel"))
                 else:
-                    results.append((convert_video_id_to_file_name(h_res['video_id']), h_res["start"], h_res["end"], "handstand"))
+                    results.append((h_res['video_id'], h_res["start"], h_res["end"], "handstand"))
     # for c_res in cartwheel_results["data"]:
     #     for h_res in handstand_results["data"]:
     #         if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
@@ -174,11 +190,11 @@ def video_segment(processed_data):
         now = datetime.now()
         currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
         
-        input_file = ffmpeg.input(chunk[0])
+        input_file = ffmpeg.input(convert_video_id_to_file_name(chunk[0]))
         output_file = ffmpeg.output(
                         input_file.video.trim(start=chunk[1], end=chunk[2]), 
                         input_file.audio, 
-                        f"{chunk[3]}-{currTime}"
+                        hash(f"{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}")
                     )
         output_file.run()
 
