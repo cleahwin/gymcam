@@ -12,16 +12,32 @@ API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
 API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
 
-default_header = {
-    "x-api-key": API_KEY
-}
+# # default_header = {
+# #     "x-api-key": API_KEY
+# # }
 
-INDEXES_VIDEOS_URL = f"{API_URL}/indexes/{INDEX_ID}/videos?page_limit=50"
-response = requests.get(INDEXES_VIDEOS_URL, headers=default_header)
+# # INDEXES_VIDEOS_URL = f"{API_URL}/indexes/{INDEX_ID}/videos?page_limit=50"
+# # response = requests.get(INDEXES_VIDEOS_URL, headers=default_header)
 
-response_json = response.json()
-print(response_json)
+
+# url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos"
+
+# headers = {
+#     "accept": "application/json",
+#     "Content-Type": "application/json",
+#     "x-api-key": API_KEY
+# }
+
+# response = requests.get(url, headers=headers)
+
+# print(response.text)
 # quit()
+response_json = requests.get(
+    TASKS_URL,
+    headers={"x-api-key": API_KEY},
+        params={"index_id": INDEX_ID, "filename": ""},
+).json()
+print(response_json)
 for video in response_json['data']:
     print(video['_id'])
     url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video['_id']}"

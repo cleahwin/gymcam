@@ -9,6 +9,7 @@ import time
 import ffmpeg
 from datetime import datetime
 import streamlit as st
+from time import sleep
 
 
 
@@ -16,6 +17,10 @@ INDEX_ID = "64be0834e180755b8bc4df6a"
 API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
 API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
+headers_dict = {
+    "accept": "application/json",
+    "Content-Type": "application/json"
+}
 
 video_ids = []
 
@@ -32,6 +37,7 @@ def contains_video(file_name):
         headers={"x-api-key": API_KEY},
         params={"index_id": INDEX_ID, "filename": file_name},
     )
+    print(f"TaskListResponse ==> {task_list_response.json}")
     if "data" in task_list_response.json():
         task_list = task_list_response.json()["data"]
         if len(task_list) > 0:
@@ -47,9 +53,14 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
     Return - boolean which has value true if the video was already in the index
     """
+<<<<<<< HEAD
 
     if (contains_video(file_name)): 
         return True
+=======
+    # if (contains_video(file_name, file_stream)): 
+    #     return True
+>>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
@@ -63,7 +74,7 @@ def upload_video(file_name, file_stream):
             }
             file_param = [
                 ("video_file", (file_name, file_stream, "application/octet-stream")),] #The video will be indexed on the platform using the same name as the video file itself.
-            response = requests.post(TASKS_URL, headers=default_header, data=data, files=file_param)
+            response = requests.post(TASKS_URL, headers=headers_dict, data=data, files=file_param)
             TASK_ID = response.json().get("_id")
             TASK_ID_LIST.append(TASK_ID)
             # Check if the status code is 201 and print success
@@ -77,6 +88,14 @@ def upload_video(file_name, file_stream):
 
     return False
 
+<<<<<<< HEAD
+=======
+# query_cache = {
+#   "cartwheel": {<INSERT THE RESPONSE HERE that visual_query gives you when the API stops timing out>},
+#   "hand stand": {<same thing here>},
+# }
+
+>>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 def visual_query(pose):
     """
     Performs a visual query on the video using certain searches using TwelveLabs API
@@ -85,6 +104,9 @@ def visual_query(pose):
     Return - the output of the query
     
     """
+    # global query_cache
+    # if pose in query_cache:
+    #     return query_cache[pose]
     # Perform search with simple query (Visual)
     SEARCH_URL = f"{API_URL}/search"
     # data =  {
@@ -110,11 +132,13 @@ def visual_query(pose):
         "x-api-key": API_KEY
     }
     response = requests.post(SEARCH_URL, headers=headers, json=data)
+    print(response)
     print(f'Status code: {response.status_code}')
     print(f"Response from Visual Query ==> {response.json()}")
     
-    return response.json()
-
+    result = response.json()
+    # query_cache[pose] = result
+    return result
 
 def process_scores():
     """
@@ -124,10 +148,12 @@ def process_scores():
     Return - returns a list of tuples consisting of a file name, start and end time, and label name
 
     """
-    cartwheel_results = visual_query("cartwheel")
-    handstand_results = visual_query("handstand")
+    cartwheel_results = visual_query("exercise")
+    # sleep(5)
+    # handstand_results = visual_query("handstand")
     results = []
     print("hi!")
+    print(cartwheel_results)
     for c_res in cartwheel_results["data"]:
         print("hello again!")
         for h_res in handstand_results["data"]:
