@@ -53,14 +53,8 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
     Return - boolean which has value true if the video was already in the index
     """
-<<<<<<< HEAD
-
-    if (contains_video(file_name)): 
-        return True
-=======
     # if (contains_video(file_name, file_stream)): 
     #     return True
->>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
