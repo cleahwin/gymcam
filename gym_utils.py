@@ -53,14 +53,8 @@ def upload_video(file_name, file_stream):
     Param - takes in the file name and file stream
     Return - boolean which has value true if the video was already in the index
     """
-<<<<<<< HEAD
-
-    if (contains_video(file_name)): 
-        return True
-=======
     # if (contains_video(file_name, file_stream)): 
     #     return True
->>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 
     # Proceed further to create a new task to index the current video if the video didn't exist in the index already
     print("Entering task creation code for the file: ", file_name)
@@ -76,26 +70,23 @@ def upload_video(file_name, file_stream):
                 ("video_file", (file_name, file_stream, "application/octet-stream")),] #The video will be indexed on the platform using the same name as the video file itself.
             response = requests.post(TASKS_URL, headers=headers_dict, data=data, files=file_param)
             TASK_ID = response.json().get("_id")
-            TASK_ID_LIST.append(TASK_ID)
+            # TASK_ID_LIST.append(TASK_ID)
             # Check if the status code is 201 and print success
             if response.status_code == 201:
                 print(f"Status code: {response.status_code} - The request was successful and a new resource was created.")
             else:
                 print(f"Status code: {response.status_code}")
             print(f"File name: {file_name}")
-            print(response.json())
+            # print(response.json())
             print("\n")
 
     return False
 
-<<<<<<< HEAD
-=======
 # query_cache = {
 #   "cartwheel": {<INSERT THE RESPONSE HERE that visual_query gives you when the API stops timing out>},
 #   "hand stand": {<same thing here>},
 # }
 
->>>>>>> 90099babcc8e1f92dfc9e44c59dbf85817fdf7d0
 def visual_query(pose):
     """
     Performs a visual query on the video using certain searches using TwelveLabs API
