@@ -19,7 +19,7 @@ TASKS_URL = f"{API_URL}/tasks"
 API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
 headers_dict = {
     "accept": "application/json",
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
 }
 
 video_ids = []
@@ -68,8 +68,13 @@ def upload_video(file_name, file_stream):
             }
             file_param = [
                 ("video_file", (file_name, file_stream, "application/octet-stream")),] #The video will be indexed on the platform using the same name as the video file itself.
-            response = requests.post(TASKS_URL, headers=headers_dict, data=data, files=file_param)
-            TASK_ID = response.json().get("_id")
+            response = requests.post(
+                TASKS_URL, 
+                headers={"x-api-key": API_KEY}, 
+                data=data, 
+                files=file_param
+            )
+            # TASK_ID = response.json().get("_id")
             # TASK_ID_LIST.append(TASK_ID)
             # Check if the status code is 201 and print success
             if response.status_code == 201:
