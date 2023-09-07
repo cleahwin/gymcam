@@ -145,27 +145,27 @@ def process_scores():
 
     """
     cartwheel_results = visual_query("exercise")
-    # sleep(5)
-    # handstand_results = visual_query("handstand")
+    sleep(5)
+    handstand_results = visual_query("handstand")
     results = []
     print("hi!")
     print(cartwheel_results)
+    # for c_res in cartwheel_results["data"]:
+    #     print("hello again!")
+    #     for h_res in handstand_results["data"]:
+    #         print("and again!")
+    #         if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
+    #             if c_res['score'] > h_res['score']:
+    #                 results.append((c_res['video_id'], c_res["start"], c_res["end"], "cartwheel"))
+    #             else:
+    #                 results.append((h_res['video_id'], h_res["start"], h_res["end"], "handstand"))
     for c_res in cartwheel_results["data"]:
-        print("hello again!")
         for h_res in handstand_results["data"]:
-            print("and again!")
             if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
                 if c_res['score'] > h_res['score']:
-                    results.append((c_res['video_id'], c_res["start"], c_res["end"], "cartwheel"))
+                    results.append((convert_video_id_to_file_name(c_res['video_id']), c_res['start'], c_res['end'], "cartwheel"))
                 else:
-                    results.append((h_res['video_id'], h_res["start"], h_res["end"], "handstand"))
-    # for c_res in cartwheel_results["data"]:
-    #     for h_res in handstand_results["data"]:
-    #         if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
-    #             if c_res['score'] > h_res['score']:
-    #                 results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel"))
-    #             else:
-    #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand"))
+                    results.append((convert_video_id_to_file_name(h_res['video_id']), h_res['start'], h_res['end'], "handstand"))
     print(f"Results ==> {results}")
     return results
 
@@ -179,7 +179,7 @@ def video_segment(processed_data):
     """
     for chunk in processed_data:
         now = datetime.now()
-        currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
+        # currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
         
         input_file = ffmpeg.input(convert_video_id_to_file_name(chunk[0]))
         output_file = ffmpeg.output(
@@ -207,6 +207,7 @@ def convert_video_id_to_file_name(video_id):
     }
 
     response = requests.get(url, headers=headers)
+    sleep(5)
 
     return response.json().get("metadata").get("filename")
 

@@ -39,7 +39,7 @@ response_json = requests.get(
 ).json()
 print(response_json)
 for video in response_json['data']:
-    print(video['_id'])
+    print(f"VIDID ===> {video['_id']}")
     url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video['_id']}"
     headers = {
         "accept": "application/json",
