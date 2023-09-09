@@ -20,17 +20,17 @@ API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
 # # response = requests.get(INDEXES_VIDEOS_URL, headers=default_header)
 
 
-# url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos"
+url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos"
 
-# headers = {
-#     "accept": "application/json",
-#     "Content-Type": "application/json",
-#     "x-api-key": API_KEY
-# }
+headers = {
+    # "accept": "application/json",
+    # "Content-Type": "application/json",
+    "x-api-key": API_KEY
+}
 
-# response = requests.get(url, headers=headers)
+response = requests.get(url, headers=headers)
 
-# print(response.text)
+print(response.text)
 # quit()
 response_json = requests.get(
     TASKS_URL,
@@ -41,7 +41,7 @@ print(response_json)
 for video in response_json['data']:
     print(video['_id'])
     url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video['_id']}"
-    headers = {
+    headers2 = {
         "accept": "application/json",
         "Content-Type": "application/json",
         "x-api-key": API_KEY
@@ -49,7 +49,8 @@ for video in response_json['data']:
 
     response = requests.delete(
         url, 
-        headers={"x-api-key": API_KEY},
+        headers=headers2,
+        # headers={"x-api-key": API_KEY},
         params={"index_id" : INDEX_ID, "video_id" : video['_id']}
     )
 
