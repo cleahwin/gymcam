@@ -9,7 +9,11 @@ import time
 import ffmpeg
 from datetime import datetime
 import streamlit as st
+
 from time import sleep
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+# from ffmpeg import FFmpeg
+
 
 
 
@@ -145,27 +149,30 @@ def process_scores():
 
     """
     cartwheel_results = visual_query("exercise")
-    # sleep(5)
-    # handstand_results = visual_query("handstand")
+    sleep(5)
+    handstand_results = visual_query("handstand")
     results = []
     print("hi!")
     print(cartwheel_results)
-    for c_res in cartwheel_results["data"]:
-        print("hello again!")
-        for h_res in handstand_results["data"]:
-            print("and again!")
-            if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
-                if c_res['score'] > h_res['score']:
-                    results.append((c_res['video_id'], c_res["start"], c_res["end"], "cartwheel"))
-                else:
-                    results.append((h_res['video_id'], h_res["start"], h_res["end"], "handstand"))
     # for c_res in cartwheel_results["data"]:
     #     for h_res in handstand_results["data"]:
-    #         if c_res["video_id"] == h_res["video_id"] and is_overlap(c_res["start_time"], c_res["end_time"], h_res["start_time"], h_res["end_time"]):
+    #         if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
     #             if c_res['score'] > h_res['score']:
-    #                 results.append((convert_video_id_to_local_file_name(c_res['video_id']), c_res['start_time'], c_res['end_time'], "cartwheel"))
+    #                 results.append((c_res['video_id'], c_res["start"], c_res["end"], "cartwheel"))
     #             else:
-    #                 results.append((convert_video_id_to_local_file_name(h_res['video_id']), h_res['start_time'], h_res['end_time'], "handstand"))
+    #                 results.append((h_res['video_id'], h_res["start"], h_res["end"], "handstand"))
+    for c_res in cartwheel_results["data"]:
+        for h_res in handstand_results["data"]:
+            if max(c_res["start"], h_res["start"]) <= min(c_res["end"], h_res["end"]):
+                print(f"C_RES ==> video ID {convert_video_id_to_file_name(c_res['video_id'])}, start {c_res['start']}, end {c_res['end']}")
+                print(f"H_RES ==> video ID {convert_video_id_to_file_name(h_res['video_id'])}, start {h_res['start']}, end {h_res['end']}")
+
+                if c_res['score'] > h_res['score']:
+                #    sleep(5)
+                   results.append((convert_video_id_to_file_name(c_res['video_id']), c_res['start'], c_res['end'], "cartwheel"))
+                else:
+                    # sleep(5)
+                    results.append((convert_video_id_to_file_name(h_res['video_id']), h_res['start'], h_res['end'], "handstand"))
     print(f"Results ==> {results}")
     return results
 
@@ -178,16 +185,24 @@ def video_segment(processed_data):
 
     """
     for chunk in processed_data:
-        now = datetime.now()
-        currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
-        
-        input_file = ffmpeg.input(convert_video_id_to_file_name(chunk[0]))
-        output_file = ffmpeg.output(
-                        input_file.video.trim(start=chunk[1], end=chunk[2]), 
-                        input_file.audio, 
-                        hash(f"{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}")
-                    )
-        output_file.run()
+        print(f"CHUNK!!! ===> {chunk}")
+        # now = datetime.now()
+        # currTime = now.strftime("%d/%m/%Y-%H:%M:%S")
+        print(f"Chunk 0 ==> {chunk[0]}")
+        input_file = ffmpeg.input(chunk[0])
+        output_file = ffmpeg.output(input_file, 'temp.mp4')
+        ffmpeg.run(output_file)       
+        # input_file = ffmpeg.input(chunk[0])
+        # output_file = ffmpeg.output(
+        #                 input_file.trim(start=chunk[1], end=chunk[2]), 
+        #                 f"{hash(f'{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}')}.mp4"
+        #             )
+        # # output_file = ffmpeg.output(input_file, hash(f"{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}"), ss=chunk[1], to=chunk[2])
+        # ffmpeg.run(output_file)
+        # print(f"{hash(f'{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}')} + .mp4")
+        # ffmpeg_extract_subclip(chunk[0], chunk[1], chunk[2], targetname=f"{hash(f'{chunk[3]}-{chunk[1]}-{chunk[2]}-{chunk[0]}')}.mp4")
+        # output_file.run()
+    
 
 
 def convert_video_id_to_file_name(video_id):
@@ -195,19 +210,22 @@ def convert_video_id_to_file_name(video_id):
     Converts provided video id to its corresponding local file name
 
     Param - the video id to convert
-    Return - the filename of the provided video id
+    Return - the filename of the provided video name
 
     """
 
     url = f"https://api.twelvelabs.io/v1.1/indexes/{INDEX_ID}/videos/{video_id}"
+    print(f"VIDEO_ID {video_id}")
 
     headers = {
+        "x-api-key": API_KEY,
         "accept": "application/json",
         "Content-Type": "application/json"
     }
 
     response = requests.get(url, headers=headers)
-
+    # sleep(5)
+    
     return response.json().get("metadata").get("filename")
 
 

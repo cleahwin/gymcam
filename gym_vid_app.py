@@ -7,6 +7,7 @@ from io import StringIO
 import time
 import gym_utils
 
+
 # Name of index for storing video data
 INDEX_ID = "64be0834e180755b8bc4df6a"
 API_URL = "https://api.twelvelabs.io/v1.1"
@@ -48,4 +49,4 @@ if uploaded_file is not None:
         # Uses visual_query function in gym_utils to retrieve scores and 
         #   collect extracted data as time segments of specific moves
         # Segments video input based on processed data
-        # gym_utils.video_segment(processed_data)
+        gym_utils.video_segment(processed_data)
