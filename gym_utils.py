@@ -6,7 +6,7 @@ import os
 import json
 from io import StringIO
 import time
-import ffmpeg
+# import ffmpeg
 from datetime import datetime
 import streamlit as st
 
@@ -16,8 +16,8 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 
 
-
-INDEX_ID = "64be0834e180755b8bc4df6a"
+# TODO: set index id to empty string (BEFORE PUTTING ON GITHUB)
+INDEX_ID = "64fe445aa7e78163bd9c124a"
 API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
 API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
@@ -27,6 +27,28 @@ headers_dict = {
 }
 
 video_ids = []
+
+def create_index():
+
+    INDEXES_URL = f"{API_URL}/indexes"
+
+    INDEX_NAME = "GymCam"
+
+    headers = {
+        "x-api-key": API_KEY
+    }
+
+    data = {
+    "engine_id": "marengo2.5",
+    "index_options": ["visual", "conversation", "text_in_video", "logo"],
+    "index_name": INDEX_NAME,
+    }
+
+    response = requests.post(INDEXES_URL, headers=headers, json=data)
+    INDEX_ID = response.json().get('_id')
+    print(INDEX_ID)
+    print (f'Status code: {response.status_code}')
+    print (response.json())
 
 def contains_video(file_name):
     """

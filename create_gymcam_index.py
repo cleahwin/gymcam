@@ -25,5 +25,6 @@ data = {
 
 response = requests.post(INDEXES_URL, headers=headers, json=data)
 INDEX_ID = response.json().get('_id')
+print(INDEX_ID)
 print (f'Status code: {response.status_code}')
 print (response.json())

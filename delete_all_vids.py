@@ -7,7 +7,7 @@ import time
 import gym_utils
 
 # Name of index for storing video data
-INDEX_ID = "64be0834e180755b8bc4df6a"
+INDEX_ID = "64fe445aa7e78163bd9c124a"
 API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
 API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
