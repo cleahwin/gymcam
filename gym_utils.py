@@ -49,6 +49,7 @@ def create_index():
     print(INDEX_ID)
     print (f'Status code: {response.status_code}')
     print (response.json())
+    return INDEX_ID
 
 def contains_video(file_name):
     """
