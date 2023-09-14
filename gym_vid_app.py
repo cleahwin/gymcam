@@ -41,12 +41,12 @@ if uploaded_file is not None:
         # Upload video to TwelveLab's index specified above
         contains_vid = gym_utils.upload_video(file_name, file_stream)
 
-    if (st.button("Classify")):
-        file_name = uploaded_file.name
-        file_path = file_name
-        file_stream = open(file_name,"rb")
-        processed_data = gym_utils.process_scores()
-        # Uses visual_query function in gym_utils to retrieve scores and 
-        #   collect extracted data as time segments of specific moves
-        # Segments video input based on processed data
-        gym_utils.video_segment(processed_data)
+if (st.button("Classify")):
+    file_name = uploaded_file.name
+    file_path = file_name
+    file_stream = open(file_name,"rb")
+    processed_data = gym_utils.process_scores()
+    # Uses visual_query function in gym_utils to retrieve scores and 
+    #   collect extracted data as time segments of specific moves
+    # Segments video input based on processed data
+    # gym_utils.video_segment(processed_data)

@@ -158,10 +158,8 @@ def visual_query(pose):
     print(response)
     print(f'Status code: {response.status_code}')
     print(f"Response from Visual Query ==> {response.json()}")
-    
-    result = response.json()
     # query_cache[pose] = result
-    return result
+    return response.json()
 
 def process_scores():
     """
@@ -172,8 +170,11 @@ def process_scores():
 
     """
     cartwheel_results = visual_query("exercise")
+    print(f"Cartwheel Results!!!! {cartwheel_results}")
     sleep(5)
     handstand_results = visual_query("handstand")
+    print(f"Handstand Results!!!! {handstand_results}")
+
     results = []
     print("hi!")
     print(cartwheel_results)
