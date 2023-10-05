@@ -2,6 +2,8 @@ import torch
 from typing import Dict
 import json
 import urllib
+import cv2
+from tqdm import tqdm        
 from torchvision.transforms import Compose, Lambda
 from torchvision.transforms._transforms_video import (
     CenterCropVideo,
@@ -67,6 +69,69 @@ class PackPathway(torch.nn.Module):
         frame_list = [slow_pathway, fast_pathway]
         return frame_list
 
+def save_chunks(cartwheel_intervals):
+    print("In save_chunks!")
+    # Open video
+    video_path = "cartwheel.mp4"
+    cap = cv2.VideoCapture(video_path)
+    save_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Read first frame
+    ret, frame = cap.read()
+    h, w, _ = frame.shape
+
+    # Initialize writers to output files (1 file for each chunk)
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    writers = []
+    num_outputs = 0
+    iteration = 0
+    for chunk_range in cartwheel_intervals:
+        iteration = iteration + 1;
+        chunk_name = f"cartwheel{iteration}.mp4"
+        writers.append(cv2.VideoWriter(chunk_name, fourcc, 20.0, (w, h)))
+
+        num_outputs += 1
+        # if limit is not None and num_outputs == limit:
+        #     break
+
+    # Read and write to output files
+    f = 0
+
+        # f += 1
+    for i, part in enumerate(cartwheel_intervals):
+        print('hiiiiii')
+        print(i)
+        print(part)
+        start, end = part
+        while f < start:
+            for j in range(frames_per_second):
+                cap.read()
+            f = f + 1
+        while f <= end:
+            for j in range(frames_per_second):
+                ret, frame = cap.read()
+                writers[i].write(frame)
+            f = f + 1
+   
+
+    # with tqdm(total=(save_num_frames - 1)) as progress_bar:
+    #     while ret:
+    #         f += 1
+    #         for i, part in enumerate(cartwheel_intervals):
+    #             start, end = part
+    #             if start <= f <= end:
+    #                 # print("i has a value that is the exact same value as")
+    #                 # # print(i)
+    #                 for j in range(frames_per_second):
+    #                     writers[i].write(frame)
+    #                     ret, frame = cap.read()
+    #         progress_bar.update(1)
+
+    # for writer in writers:
+    #     writer.release()
+
+    cap.release()
+
 def find_cartwheels(video_path):
     transform =  ApplyTransformToKey (
         key="video",
@@ -90,11 +155,26 @@ def find_cartwheels(video_path):
     # Initialize an EncodedVideo helper class and load the video
     video = EncodedVideo.from_path(video_path)
     # Time length for 'chunk' that we look at a time
-    chunk_secs = 64 / frames_per_second  # approx. 5 seconds
+    chunk_secs = 2
     # List of start seconds for each 2 second chunk where there is a carthweel
     cartwheel_intervals = []
+    cartwheel_combined_intervals = []
+    # Whether or not the current chunk had a cartwheel in it
+    has_cartwheel = False
+    # Whether or not the last chunk had a cartwheel in it
+    has_previous_cartwheel = False
+    # Start time of the current cartwheel chunk
+    current_cartwheel = 0
+
+    chunk_frames = chunk_secs * frames_per_second
+    chunk_frames_rounded = round(chunk_frames / num_frames) * num_frames
+    chunk_secs = chunk_frames_rounded / frames_per_second
+
     print(int(video.duration))
-    for start_sec in range(0, int(video.duration), int(chunk_secs)):
+
+    #TODO: Start sec starts at 2 to ignore camera setup time; change this back to 0
+    #   when app has countdown for when session starts
+    for start_sec in range(1, int(video.duration), int(chunk_secs) - 1):
         print(f"start_sec: {start_sec}")
         end_sec = start_sec + chunk_secs
         # Select the duration of the clip to load by specifying the start and end duration
@@ -124,10 +204,25 @@ def find_cartwheels(video_path):
         # Updates list with start time segment if chunk contained carthweel
         if "cartwheeling" in pred_class_names:
             cartwheel_intervals.append(start_sec)
+            if not has_previous_cartwheel:
+                current_cartwheel = start_sec
+                has_previous_cartwheel = True
+        else:
+            if has_previous_cartwheel:
+                cartwheel_combined_intervals.append((current_cartwheel, start_sec))
+                has_previous_cartwheel = False
+    if has_previous_cartwheel:
+        cartwheel_combined_intervals.append((current_cartwheel, int(video.duration)))
+        # check if time intervals containing cartwheels are consecutive
 
     print(cartwheel_intervals)
-            
+    
+    print(f" cartwheel_combined - {cartwheel_combined_intervals}")
+
+    return cartwheel_combined_intervals
 
     
 video_path = 'cartwheel.mp4'
-find_cartwheels(video_path)
+cartwheel_combined_intervals = find_cartwheels(video_path)
+# find_cartwheels(video_path)
+save_chunks(cartwheel_combined_intervals)
