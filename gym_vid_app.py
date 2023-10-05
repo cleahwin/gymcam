@@ -10,10 +10,8 @@ import gym_utils
 
 # Name of index for storing video data
 # TODO: change to empty string before uploasing
-INDEX_ID = "64fe445aa7e78163bd9c124a"
 API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
-API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
 
 st.title('GymCam')
 contains_vid = False
@@ -21,7 +19,7 @@ contains_vid = False
 if st.button("Provide API Key and Index ID"):
     st.subheader("API Key")
     API_KEY = st.text_input("Please provide API Key for TwelveLabs")
-    # INDEX_ID = gym_utils.create_index
+    INDEX_ID = gym_utils.create_index(API_KEY)
 
 st.subheader("Upload Video")
 uploaded_file = st.file_uploader("Choose a file")
