@@ -6,7 +6,7 @@ import os
 API_URL = "https://api.twelvelabs.io/v1.1"
 assert API_URL
 
-API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
+API_KEY = ""
 assert API_KEY
 
 INDEXES_URL = f"{API_URL}/indexes"

@@ -16,11 +16,10 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 
 
-# TODO: set index id to empty string (BEFORE PUTTING ON GITHUB)
-INDEX_ID = "64fe445aa7e78163bd9c124a"
+INDEX_ID = ""
 API_URL = "https://api.twelvelabs.io/v1.1"
 TASKS_URL = f"{API_URL}/tasks"
-API_KEY = "tlk_0XA82RJ21EMJBQ2THYH1P2JZMDH8"
+API_KEY = ""
 headers_dict = {
     "accept": "application/json",
     "Content-Type": "application/json",
@@ -28,8 +27,8 @@ headers_dict = {
 
 video_ids = []
 
-def create_index():
-
+def create_index(API_KEY):
+    API_KEY = API_KEY
     INDEXES_URL = f"{API_URL}/indexes"
 
     INDEX_NAME = "GymCam"
